@@ -11,27 +11,18 @@ extern "C" {
 #include "esp_log.h"
 #include "TMC2209.h"
 
-/**
- * This is an example which echos any data it receives on configured UART back to the sender,
- * with hardware flow control turned off. It does not use UART driver event queue.
- *
- * - Port: configured UART
- * - Receive (Rx) buffer: on
- * - Transmit (Tx) buffer: off
- * - Flow control: off
- * - Event queue: off
- * - Pin assignment: see defines below (See Kconfig)
- */
 #define UART_MAX_DELAY    100
 
+// Declare struct instances for TMC2209 driver and its condiguration
 TMC2209TypeDef tmc2209_driver_def;
 TMC2209TypeDef *tmc2209_driver = &tmc2209_driver_def;
 ConfigurationTypeDef tmc_2209_driver_config_def;
 ConfigurationTypeDef *tmc_2209_driver_config = &tmc_2209_driver_config_def;
 
 static const char *TAG = "TMC2209 Driver";
-uart_port_t UART_PORT_NUM = UART_NUM_2;
 
+// Using UART port number 2
+uart_port_t UART_PORT_NUM = UART_NUM_2;
 
 const gpio_num_t
     EN_PIN     = GPIO_NUM_23, // Enable
@@ -45,8 +36,8 @@ const gpio_num_t
     SW_TX      = GPIO_NUM_17; // TMC2208/TMC2224 SoftwareSerial transmit pin
 
 constexpr uint8_t DRIVER_ADDRESS = 0b00; // TMC2209 Driver address according to MS1 and MS2
-constexpr float R_SENSE = 0.11f; // Current shunt resistor
 
+// tmc2209_periodicJob function needs to be called periodically to update the registers
 static void stepper_motor_periodic_task(void *arg)
 {
     while (true) {
@@ -61,7 +52,11 @@ static void stepper_motor_task(void *arg)
     // Need to reverse table because data is flipped.
     // Using Index 0 for channel 1. Index 1 is for channel 2.
     tmc_fillCRC8Table((uint8_t)0b100000111, true, 0);
+
+    // Initialize TMC2209 driver
     tmc2209_init(tmc2209_driver, 0, DRIVER_ADDRESS, tmc_2209_driver_config, tmc2209_defaultRegisterResetState);
+
+    // Create periodic task to update TMC2209 registers
     xTaskCreatePinnedToCore(stepper_motor_periodic_task, "stepper_motor_periodic_task", 4096, NULL, 3, NULL, tskNO_AFFINITY);
     tmc2209_reset(tmc2209_driver);
 
@@ -107,8 +102,6 @@ static void stepper_motor_task(void *arg)
     
 }
 
-
-
 void tmc2209_readWriteArray(uint8_t channel, uint8_t *data, size_t writeLength, size_t readLength)
 {
     uart_write_bytes(UART_PORT_NUM, data, writeLength);
@@ -119,49 +112,7 @@ void tmc2209_readWriteArray(uint8_t channel, uint8_t *data, size_t writeLength, 
     }
 }
 
-// // CRC8 function from TMC2209 datasheet
-// void tmc2209_CRC8(uint8_t *datagram, size_t datagramLength)
-// {
-//     int i,j;
-//     uint8_t *crc = datagram + (datagramLength - 1); // CRC located in last byte of message
-//     uint8_t currentByte;
-//     *crc = 0;
-//     for (i = 0; i < (datagramLength - 1); i++) {    // Execute for all bytes of a message
-//         currentByte = datagram[i];                  // Retrieve a byte to be sent from Array
-//     for (j=0; j<8; j++) {
-//         if ((*crc >> 7) ^ (currentByte&0x01)) // update CRC based result of XOR operation
-//         {
-//             *crc = (*crc << 1) ^ 0x07;
-//         }
-//         else
-//         {
-//             *crc = (*crc << 1);
-//         }
-//         currentByte = currentByte >> 1;
-//     } // for CRC bit
-
-//     } // for message byte
-// }
-
-// // CRC8 function from TMCStepper library
-// uint8_t tmc2209_CRC8(const uint8_t datagram[], const uint8_t len) {
-// 	uint8_t crc = 0;
-// 	for (uint8_t i = 0; i < (len-1); i++) {
-// 		uint8_t currentByte = datagram[i];
-// 		for (uint8_t j = 0; j < 8; j++) {
-// 			if ((crc >> 7) ^ (currentByte & 0x01)) {
-// 				crc = (crc << 1) ^ 0x07;
-// 			} else {
-// 				crc = (crc << 1);
-// 			}
-// 			crc &= 0xff;
-// 			currentByte = currentByte >> 1;
-// 		}
-// 	}
-// 	return crc;
-// }
-
-// // CRC8 function from TMC-API
+// CRC8 function from TMC-API
 uint8_t tmc2209_CRC8(uint8_t *datagram, size_t datagramLength)
 {
     return tmc_CRC8(datagram, datagramLength, 0);
@@ -210,8 +161,6 @@ void configure_uart(uint32_t baudrate)
 
 void app_main(void)
 {
-
-
     configure_gpio();
     configure_uart(115200);
     
