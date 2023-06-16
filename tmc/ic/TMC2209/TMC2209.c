@@ -71,7 +71,7 @@ int32_t tmc2209_readInt(TMC2209TypeDef *tmc2209, uint8_t address)
 	return ((uint32_t)data[3] << 24) | ((uint32_t)data[4] << 16) | (data[5] << 8) | data[6];
 }
 
-void tmc2209_init(TMC2209TypeDef *tmc2209, uint8_t channel, uint8_t slaveAddress, ConfigurationTypeDef *tmc2209_config, const int32_t *registerResetState)
+void tmc2209_init(TMC2209TypeDef *tmc2209, uint8_t channel, uint8_t slaveAddress, ConfigurationTypeDef *tmc2209_config, const uint32_t *registerResetState)
 {
 	tmc2209->slaveAddress = slaveAddress;
 

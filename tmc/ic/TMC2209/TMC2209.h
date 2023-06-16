@@ -8,8 +8,8 @@
 #ifndef TMC_IC_TMC2209_H_
 #define TMC_IC_TMC2209_H_
 
-#include "tmc/helpers/Constants.h"
-#include "tmc/helpers/API_Header.h"
+#include "../../../tmc/helpers/Constants.h"
+#include "../../../tmc/helpers/API_Header.h"
 #include "TMC2209_Register.h"
 #include "TMC2209_Constants.h"
 #include "TMC2209_Fields.h"
@@ -17,6 +17,8 @@
 // Helper macros
 #define TMC2209_FIELD_READ(tdef, address, mask, shift) \
 	FIELD_GET(tmc2209_readInt(tdef, address), mask, shift)
+#define TMC2209_FIELD_WRITE(tdef, address, mask, shift, value) 	\
+	(tmc2209_writeInt(tdef, address, ((value)<<(shift)) & (mask)))
 #define TMC2209_FIELD_UPDATE(tdef, address, mask, shift, value) \
 	(tmc2209_writeInt(tdef, address, FIELD_SET(tmc2209_readInt(tdef, address), mask, shift, value)))
 
@@ -60,7 +62,7 @@ static const uint8_t tmc2209_defaultRegisterAccess[TMC2209_REGISTER_COUNT] =
 	0x03, 0x01, 0x01, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____, ____  // 0x70 - 0x7F
 };
 
-static const int32_t tmc2209_defaultRegisterResetState[TMC2209_REGISTER_COUNT] =
+static const uint32_t tmc2209_defaultRegisterResetState[TMC2209_REGISTER_COUNT] =
 {
 //	0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
 	R00, 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, // 0x00 - 0x0F
@@ -85,7 +87,7 @@ static const int32_t tmc2209_defaultRegisterResetState[TMC2209_REGISTER_COUNT] =
 void tmc2209_writeInt(TMC2209TypeDef *tmc2209, uint8_t address, int32_t value);
 int32_t tmc2209_readInt(TMC2209TypeDef *tmc2209, uint8_t address);
 
-void tmc2209_init(TMC2209TypeDef *tmc2209, uint8_t channel, uint8_t slaveAddress, ConfigurationTypeDef *tmc2209_config, const int32_t *registerResetState);
+void tmc2209_init(TMC2209TypeDef *tmc2209, uint8_t channel, uint8_t slaveAddress, ConfigurationTypeDef *tmc2209_config, const uint32_t *registerResetState);
 uint8_t tmc2209_reset(TMC2209TypeDef *tmc2209);
 uint8_t tmc2209_restore(TMC2209TypeDef *tmc2209);
 void tmc2209_setRegisterResetState(TMC2209TypeDef *tmc2209, const int32_t *resetState);

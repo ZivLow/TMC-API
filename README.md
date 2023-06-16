@@ -1,3 +1,8 @@
+# Changes from original TMC-API fork
+1) Modified TMC2209.c and TMC2209.h
+2) Add CMakeList.txt to work with ESP-IDF as a component
+3) Added example of usage with TMC2209 driver via UART control. Follow instructions in README.md in the example folder. (Tested with ESP32 DevKitC v4)
+
 # TMC-API
 
 The TMC-API is a portable C library for working with Trinamic ICs in embedded projects.
