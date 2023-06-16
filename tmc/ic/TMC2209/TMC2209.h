@@ -8,8 +8,7 @@
 #ifndef TMC_IC_TMC2209_H_
 #define TMC_IC_TMC2209_H_
 
-#include "../../../tmc/helpers/Constants.h"
-#include "../../../tmc/helpers/API_Header.h"
+#include "API_Header.h"
 #include "TMC2209_Register.h"
 #include "TMC2209_Constants.h"
 #include "TMC2209_Fields.h"
