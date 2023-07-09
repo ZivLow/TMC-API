@@ -9,7 +9,7 @@ extern "C" {
 #include "driver/gpio.h"
 #include "sdkconfig.h"
 #include "esp_log.h"
-#include "TMC2209.h"
+#include "tmc/ic/TMC2209/TMC2209.h"
 
 #define UART_MAX_DELAY    100
 
